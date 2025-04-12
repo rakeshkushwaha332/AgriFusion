@@ -94,6 +94,11 @@ app.get('/dashboard', (req, res) => {
   }
 });
 
+app.get('/about', (req, res) => {
+  res.render('about');
+});
+
+
 // ✅ Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
