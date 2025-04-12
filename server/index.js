@@ -9,57 +9,62 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// ✅ Set EJS as view engine and views folder
+// ✅ Set EJS as view engine and views directory
 app.set('view engine', 'ejs');
-app.set('views', './views'); // ✅ use a dedicated views folder
+app.set('views', './views');
 
-// ✅ Middleware
+// ✅ Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static('public')); // ✅ keep static files here (CSS, JS, images)
 
-// ✅ MongoDB connection
+// ✅ Static file serving (CSS, JS, images from /public folder)
+app.use(express.static('public')); // So /public/images/image.png becomes /images/image.png
+
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // ✅ Routes
 
-// GET: Home (Login Page)
+// GET: Home Page
 app.get('/', (req, res) => {
   res.render('home', { error: null });
 });
 
-// GET: Register
+// GET: Register Page
 app.get('/register', (req, res) => {
   res.render('register');
 });
 
-// POST: Register user
+// POST: Register User
 app.post('/register', async (req, res) => {
-    const { name, email, password, role, city, state, country, pincode } = req.body;
-  
-    const hashedPassword = await bcrypt.hash(password, 10);
-  
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      location: role === 'farmer' ? { city, state, country, pincode } : undefined
-    });
-  
-    await newUser.save();
-  
-    res.redirect('/?message=registered');
-  });
-  app.get('/login', (req, res) => {
-    res.render('login', { error: null });
+  const { name, email, password, role, city, state, country, pincode } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = new User({
+    name,
+    email,
+    password: hashedPassword,
+    role,
+    location: role === 'farmer' ? { city, state, country, pincode } : undefined
   });
 
-// POST: Login
+  await newUser.save();
+
+  res.redirect('/?message=registered');
+});
+
+// GET: Login Page
+app.get('/login', (req, res) => {
+  res.render('login', { error: null });
+});
+
+// POST: Login User
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -73,22 +78,23 @@ app.post('/login', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-// GET: Dashboard (Protected)
+// GET: Dashboard Page (Protected)
 app.get('/dashboard', (req, res) => {
-    const token = req.cookies.token;
-    if (!token) return res.redirect('/');
-  
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      res.render('dashboard', {
-        role: decoded.role,
-        query: req.query
-      });
-    } catch (err) {
-      return res.redirect('/');
-    }
-  });
-  
+  const token = req.cookies.token;
+  if (!token) return res.redirect('/');
 
-// Start server
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.render('dashboard', {
+      role: decoded.role,
+      query: req.query
+    });
+  } catch (err) {
+    return res.redirect('/');
+  }
+});
+
+// ✅ Start Server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
