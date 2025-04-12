@@ -1,24 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriFusion - Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Flowbite CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
 </head>
-<body>
-    <div>
+<body class="bg-green-100 min-h-screen flex flex-col">
 
-        <div class="min " >
-            <%- include('header') %>
-    
-        </div>
-         <div>
-            homepage
-         </div>
-        <div>
-            <%- include('footer') %>
-        </div>
+  <!-- Header -->
+  <div>
+    <%- include('header') %>
+  </div>
+
+  <!-- Hero Carousel -->
+  <div id="default-carousel" class="relative w-full max-w-screen-lg mx-auto mt-6" data-carousel="static">
+    <!-- Carousel wrapper -->
+    <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
+      <!-- Slide 1 (local image) -->
+      <div class="hidden duration-700 ease-in-out" data-carousel-item>
+        <img src="/images/rajesh-ram-HOOKgN_zIY8-unsplash.jpg" class="absolute block w-full h-full object-cover" alt="farm1">
+      </div>
+      <!-- Slide 2 -->
+      <div class="hidden duration-700 ease-in-out" data-carousel-item>
+        <img src="/images/tim-mossholder-xDwEa2kaeJA-unsplash.jpg" class="absolute block w-full h-full object-cover" alt="farm2">
+      </div>
+      <!-- Slide 3 -->
+      <div class="hidden duration-700 ease-in-out" data-carousel-item>
+        <img src="/images/warren-J33qmCVr02A-unsplash.jpg" class="absolute block w-full h-full object-cover" alt="farm3">
+      </div>
     </div>
+
+    <!-- Slider controls -->
+    <button type="button" class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
+      <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/30 group-hover:bg-white/50">
+        ❮
+      </span>
+    </button>
+    <button type="button" class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
+      <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/30 group-hover:bg-white/50">
+        ❯
+      </span>
+    </button>
+  </div>
+
+  <!-- Description Section -->
+  <main class="flex-1 flex items-center justify-center text-center px-4 mt-8">
+    <div class="max-w-3xl bg-white p-8 rounded-xl shadow-lg">
+      <h1 class="text-3xl md:text-4xl font-bold text-green-800 mb-4">
+        Welcome to AgriFusion 🌾
+      </h1>
+      <p class="text-lg md:text-xl text-gray-700">
+        We are an agriculture platform where farmers can sell their goods directly and get the <span class="font-semibold text-green-700">best price</span>.
+        Our main motive is to <span class="font-semibold text-green-700">eliminate middlemen</span> and provide <span class="font-semibold text-green-700">high-quality agricultural goods</span> to consumers while ensuring <span class="font-semibold text-green-700">maximum profit</span> for our farmers.
+      </p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div class="mt-8">
+    <%- include('footer') %>
+  </div>
+
+  <!-- Flowbite JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 </body>
 </html>
