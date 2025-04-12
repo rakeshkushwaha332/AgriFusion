@@ -1,99 +1,94 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('./models/User.js');
-const Place = require('./models/Place.js');
-const Booking = require('./models/Booking.js');
 const cookieParser = require('cookie-parser');
-const imageDownloader = require('image-downloader');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const multer = require('multer');
-const fs = require('fs');
-const mime = require('mime-types');
+const User = require('./models/User');
 require('dotenv').config();
 
 const app = express();
-const router = express.Router();
+const PORT = process.env.PORT || 4000;
 
-const bcryptSalt = bcrypt.genSaltSync(10);
-const jwtSecret = process.env.JWT_SECRET || 'fallbackSecret';
-const bucket = 'dawid-booking-app';
+// ✅ Set EJS as view engine and views folder
+app.set('view engine', 'ejs');
+app.set('views', './views'); // ✅ use a dedicated views folder
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/farmmarketplace', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-app.use(express.json());
+// ✅ Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/uploads', express.static(__dirname + '/uploads'));
-app.use(cors({
-  credentials: true,
-  origin: 'http://127.0.0.1:5173',
-}));
+app.use(express.static('public')); // ✅ keep static files here (CSS, JS, images)
 
-// Register
-router.post('/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
+// ✅ MongoDB connection
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('✅ MongoDB connected'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-  if (!['farmer', 'customer'].includes(role)) {
-    return res.status(400).json({ message: 'Invalid role specified.' });
-  }
+// ✅ Routes
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ name, email, password: hashedPassword, role });
-
-  await user.save();
-  res.status(201).json({ message: 'User registered successfully' });
+// GET: Home (Login Page)
+app.get('/', (req, res) => {
+  res.render('home', { error: null });
 });
 
-// Login
-router.post('/login', async (req, res) => {
+// GET: Register
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+// POST: Register user
+app.post('/register', async (req, res) => {
+    const { name, email, password, role, city, state, country, pincode } = req.body;
+  
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      location: role === 'farmer' ? { city, state, country, pincode } : undefined
+    });
+  
+    await newUser.save();
+  
+    res.redirect('/?message=registered');
+  });
+  app.get('/login', (req, res) => {
+    res.render('login', { error: null });
+  });
+
+// POST: Login
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.render('login', { error: 'Invalid credentials' });
   }
 
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    jwtSecret,
-    { expiresIn: '7d' }
-  );
-
-  res.json({ token, user: { name: user.name, role: user.role } });
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
+  res.cookie('token', token);
+  res.redirect('/dashboard');
 });
 
-// Token verification
-const verifyToken = (roles = []) => {
-  return (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+// GET: Dashboard (Protected)
+app.get('/dashboard', (req, res) => {
+    const token = req.cookies.token;
+    if (!token) return res.redirect('/');
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      res.render('dashboard', {
+        role: decoded.role,
+        query: req.query
+      });
+    } catch (err) {
+      return res.redirect('/');
+    }
+  });
+  
 
-    jwt.verify(token, jwtSecret, (err, user) => {
-      if (err || (roles.length && !roles.includes(user.role))) {
-        return res.status(403).json({ message: 'Forbidden' });
-      }
-      req.user = user;
-      next();
-    });
-  };
-};
-
-// Dummy postProduct route (farmer only)
-const postProduct = (req, res) => {
-  res.json({ message: "Product posted successfully by farmer." });
-};
-
-router.post('/products', verifyToken(['farmer']), postProduct);
-
-app.use('/api', router);
-
-app.listen(4000, () => {
-  console.log("✅ Server running at http://localhost:4000");
-});
+// Start server
+app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
