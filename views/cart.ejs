@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Your Cart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <%- include('header') %>
+
+  <div class="max-w-4xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold mb-6">🛒 Your Cart</h1>
+
+    <% if (!cart || cart.items.length === 0) { %>
+      <p class="text-center text-gray-500">Your cart is empty.</p>
+    <% } else { %>
+      <ul class="space-y-4">
+        <% cart.items.forEach(({ product, quantity }) => { %>
+          <li class="border p-4 rounded bg-white flex justify-between items-center">
+            <div>
+              <p class="font-semibold"><%= product.title %></p>
+              <p>Price: ₹<%= product.sellingPrice %></p>
+              <p>Quantity: <%= quantity %></p>
+            </div>
+            <form method="POST" action="/cart/buy" class="text-right mt-6">
+  <button class="bg-green-700 text-white px-5 py-2 rounded hover:bg-green-800">
+    🛍️ Buy Now
+  </button>
+</form>
+            <form method="POST" action="/cart/remove/<%= product._id %>">
+              <button class="text-red-600 hover:underline">Remove</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+
+  <%- include('footer') %>
+</body>
+</html>
+
