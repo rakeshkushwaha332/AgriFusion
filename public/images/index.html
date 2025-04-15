@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India Crop Map</title>
+
+  <!-- Tailwind CSS (optional) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    #map { height: 600px; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <div class="max-w-5xl mx-auto p-6 bg-white rounded shadow">
+    <h1 class="text-2xl font-bold mb-4 text-center">Major Crop Producing Regions in India</h1>
+    <div id="map" class="rounded border shadow"></div>
+  </div>
+
+  <script>
+    // Initialize the map centered on India
+    const map = L.map('map').setView([22.9734, 78.6569], 5);
+
+    // Use OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Custom green marker icon
+    const greenIcon = L.icon({
+      iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+
+    // Load CSV and place markers
+    Papa.parse("india_crop_locations.csv", {
+      header: true,
+      download: true,
+      complete: function(results) {
+        results.data.forEach(entry => {
+          const lat = parseFloat(entry.latitude);
+          const lng = parseFloat(entry.longitude);
+          const popupText = `<strong>${entry.state}</strong><br/>${entry.crops}`;
+          if (!isNaN(lat) && !isNaN(lng)) {
+            L.marker([lat, lng], { icon: greenIcon }).addTo(map).bindPopup(popupText);
+          }
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
