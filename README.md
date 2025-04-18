@@ -24,6 +24,15 @@ By leveraging modern web technologies, AgroFusion empowers farmers with greater 
 - 🧾 Transparent pricing model — farmers set their own rates, no middlemen involved.
 
 ## 📸 Screenshots
+![image](https://github.com/user-attachments/assets/72858bfe-9893-4d37-96c4-04f1553b33c2)
+![image](https://github.com/user-attachments/assets/a2c78bf1-157c-4343-ac7f-054e6002038b)
+![image](https://github.com/user-attachments/assets/2aadefb2-eeb3-48c6-aa75-bb1bca058a1e)
+![image](https://github.com/user-attachments/assets/03f043ef-3c38-46a5-a143-958fc8e83589)
+![image](https://github.com/user-attachments/assets/7da3c081-ba63-42d5-ae90-fc2fcdda4bd0)
+
+
+
+
 
 Coming soon!
 
@@ -38,6 +47,9 @@ Coming soon!
 ## 🧑‍💻 Team
 
 Built with ❤️ by a team of passionate developers at IgnitionHack2025.
+
+
+Rakesh Kushwaha (https://github.com/rakeshkushwaha332).
 
 
 ## 📂 Getting Started
