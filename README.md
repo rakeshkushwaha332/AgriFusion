@@ -47,6 +47,8 @@ Coming soon!
 ## 🧑‍💻 Team
 
 Built with ❤️ by a team of passionate developers at IgnitionHack2025.
+
+
 Rakesh Kushwaha (https://github.com/rakeshkushwaha332).
 
 
